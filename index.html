@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>Nitin Mishra — Video Editor</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -84,7 +83,10 @@ footer{padding:28px;text-align:center;color:var(--muted);font-size:13px}
 .pl{position:absolute;top:50%;left:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:rgba(255,255,255,.92);display:grid;place-items:center}
 .pl::after{content:"";border-left:16px solid #0f2d44;border-top:10px solid transparent;border-bottom:10px solid transparent;margin-left:4px}
 .card.on{cursor:default}.card:hover.on,.card.on:hover{transform:none}.card iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-.card:focus-visible{outline:3px solid #6fb8e6;outline-offset:3px}.card.on{cursor:default;transform:none!important;box-shadow:none}.card.on iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block}.video-close{position:absolute;right:10px;top:10px;z-index:5;width:32px;height:32px;border:0;border-radius:50%;background:rgba(15,45,68,.82);color:#fff;font-size:22px;line-height:32px;cursor:pointer}.video-close:hover{background:#fff;color:#0f2d44}
+.card:focus-visible{outline:3px solid #6fb8e6;outline-offset:3px}
+.wrap canvas{display:none;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 24px 30px rgba(30,90,140,.18))}
+.grid .card>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.grid .card.on{background:#000}
 </style>
 </head>
 <body>
@@ -92,7 +94,7 @@ footer{padding:28px;text-align:center;color:var(--muted);font-size:13px}
 <nav><b>Nitin Mishra</b><div><a href="#work">Work</a><a href="#about">About</a><a href="#contact">Contact</a></div></nav>
 
 <div class="stage"><div class="wrap" id="wrap">
-<svg viewBox="0 0 600 540" role="img" aria-label="Illustrated developer working on a laptop. She reacts when you move your cursor.">
+<canvas id="cv" role="img" aria-label="Animated portrait of Nitin Mishra"></canvas><svg viewBox="0 0 600 540" role="img" aria-label="Illustrated developer working on a laptop. She reacts when you move your cursor.">
 <g id="char"><g id="panel"><rect x="396" y="150" width="194" height="150" rx="12" fill="#0f2d44"/><rect id="pv" x="406" y="160" width="174" height="82" rx="6" fill="#2b78ad"/><path d="M486 186l22 14-22 14z" fill="#fff" opacity=".85"/><rect x="406" y="250" width="90" height="10" rx="3" fill="#6fb8e6"/><rect x="440" y="264" width="120" height="10" rx="3" fill="#b9e0f7"/><rect x="418" y="278" width="100" height="10" rx="3" fill="#4a9fd4"/><g id="ph" transform="translate(416 0)"><line y1="246" y2="292" stroke="#fff" stroke-width="2"/><path d="M-5 243h10l-5 6z" fill="#fff"/></g></g>
  <path d="M168 545 L190 345 Q300 300 410 345 L432 545Z" fill="#2b78ad"/>
  <rect x="278" y="240" width="44" height="86" rx="14" fill="#d89e78"/>
@@ -128,7 +130,7 @@ footer{padding:28px;text-align:center;color:var(--muted);font-size:13px}
 </main>
 <div class="page">
 <section id="work"><h2>Selected work</h2>
-<p class="lead">Twelve cuts in square, landscape and portrait. Press play on any box to watch the video here without leaving the page.</p>
+<p class="lead">Twelve cuts in square, landscape and portrait. Press play on any box and it runs right here.</p>
 <div class="grid" id="grid"></div>
 <a class="btn" href="https://www.youtube.com/playlist?list=PLVEFpNv7ua1FjLcTWL_Nig7gG50IgMRdK" target="_blank" rel="noopener">Watch all 12 on YouTube</a>
 <div class="cols" style="margin-top:44px">
@@ -188,6 +190,7 @@ function loop(now){
  const dt=Math.min(.05,(now-last)/1000);last=now;
  if(mode==='greet'){const e=now-t0;while(si<SEQ.length&&SEQ[si][0]<=e){const s=SEQ[si++];Object.assign(tgt,POSE[s[1]]);if(s[2])say('R',s[2])}}
  for(const k in cur){cur[k]+=(tgt[k]-cur[k])*(1-Math.exp(-dt*(K[k]||8)))}
+ fstep(dt);
  if(mode==='work'){tgt.hx=track.x*10;tgt.hr=track.x*4;tgt.ex=track.x*5;tgt.ey=4+track.y*3}
  phx+=(416+158*(track.x/2+.5)-phx)*(1-Math.exp(-dt*10));ph.setAttribute('transform',`translate(${phx} 0)`);pv.setAttribute('fill',`hsl(${200+(phx-416)/158*40} 62% 48%)`);
  const t=now/1000,ty=cur.tp*Math.sin(t*17)*5,wv=Math.sin(t*11)*28*cur.wv;
@@ -224,31 +227,43 @@ const T=[['Timeline','<g class="a"><rect x="14" y="22" width="60" height="14" rx
 ['Final render','<rect x="20" y="42" width="120" height="16" rx="8" fill="#fff" opacity=".2"/><rect class="a" x="20" y="42" width="84" height="16" rx="8" fill="#6fb8e6"/>']];
 const IDS=['Q4BJgyeWmtw','5aSPfJJkh4A','bMEFLe-ELhU','T7zqeCBEzv4','t1ogNwUAum4','3p8tUpZPryk','kl8arRtJF-U','lJeR7G2fLd0','FTd2QqzYdhs','dlw3GMblAMk','Jin0WypD83Q','tGngvSgyHl4'];
 const AR=['16/9','9/16','1/1','1/1','16/9','9/16','9/16','16/9','1/1','16/9','9/16','1/1'];
-$('grid').innerHTML=IDS.map((id,i)=>`<div class="card" role="button" tabindex="0" aria-label="Play video ${i+1}" data-video-id="${id}" style="--r:${AR[i]};background:${BG[i%4]}"><svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${T[i][1]}</svg><i class="pl"></i><span>Video ${String(i+1).padStart(2,'0')}<small>${T[i][0]}</small></span></div>`).join('');
-
-function playCard(card){
-  if(card.classList.contains('on')) return;
-  const id=card.dataset.videoId;
-  card.classList.add('on');
-  const origin = (location.protocol === "http:" || location.protocol === "https:") ? location.origin : "";
-  const originParam = origin ? `&origin=${encodeURIComponent(origin)}` : "";
-  card.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=1&playsinline=1&rel=0&enablejsapi=1${originParam}" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="eager" referrerpolicy="strict-origin-when-cross-origin"></iframe><button class="video-close" type="button" aria-label="Close video">×</button>`;
-  card.querySelector('.video-close').addEventListener('click',e=>{e.stopPropagation(); location.reload();});
-}
-$('grid').addEventListener('click',e=>{const card=e.target.closest('.card'); if(card && !e.target.closest('.video-close')) playCard(card);});
-$('grid').addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ') && e.target.classList.contains('card')){e.preventDefault();playCard(e.target);}});
+const card=(id,i)=>`<div class="card" role="button" tabindex="0" data-i="${i}" aria-label="Play video ${i+1}" style="--r:${AR[i]};background:#0f2d44"><img alt="" loading="lazy" src="https://i.ytimg.com/vi/${id}/maxresdefault.jpg" onload="if(this.naturalWidth<200)this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'" onerror="this.onerror=null;this.src='https://i.ytimg.com/vi/${id}/hqdefault.jpg'"><i class="pl"></i></div>`;
+$('grid').innerHTML=IDS.map(card).join('');
+const play=c=>{if(!c||c.classList.contains('on'))return;
+ document.querySelectorAll('.card.on').forEach(o=>{const i=+o.dataset.i;o.outerHTML=card(IDS[i],i)});
+ const c2=document.querySelector(`.card[data-i="${c.dataset.i}"]`),i=+c2.dataset.i;c2.classList.add('on');c2.removeAttribute('role');c2.removeAttribute('tabindex');c2.style.background='#000';
+ c2.innerHTML=`<iframe src="https://www.youtube.com/embed/${IDS[i]}?autoplay=1&rel=0&playsinline=1" title="Video ${i+1}" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`};
+$('grid').addEventListener('click',e=>play(e.target.closest('.card')));
+$('grid').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();play(e.target.closest('.card'))}});
 const track={x:0,y:0};let phx=416;const ph=$('ph'),pv=$('pv');
+
+/* ===== YOUR OWN CHARACTER (frame sequence) =====
+   1. Make a short character video, then export frames:
+      ffmpeg -i character.mp4 -vf "fps=24,scale=1280:-1" -c:v libwebp -quality 80 frames/frame_%03d.webp
+   2. Put the frames folder next to this index.html.
+   3. Set total and the frame ranges below (frame = seconds x 24).
+   Leave total at 0 to keep the built-in illustrated character. */
+const FR={dir:'frames/',pattern:'frame_{n}.webp',pad:3,start:1,total:0,fps:24,
+ work:[1,48],      /* typing loop; her first and last frames should match */
+ left:[49,72],     /* looks left, holds the last frame */
+ right:[73,96],    /* looks right, holds the last frame */
+ greet:[97,240]};  /* headset off, wave, point; holds the last frame */
+const cv=$('cv'),cx=cv.getContext('2d');let imgs=[],fOn=false,fp={a:1,b:1,dir:1,loop:true,n:1,then:null},prev='work';
+const fsrc=n=>FR.dir+FR.pattern.replace('{n}',String(n).padStart(FR.pad,'0'));
+function fplay(a,b,loop,then){fp={a,b,dir:b>=a?1:-1,loop,n:a,then}}
+function fstep(dt){if(!fOn)return;const r=fp;
+ if(r.a!==r.b){r.n+=r.dir*FR.fps*dt;if(r.dir>0?r.n>=r.b:r.n<=r.b){if(r.loop)r.n=r.a;else{r.n=r.b;if(r.then){const t=r.then;r.then=null;t()}}}}
+ const im=imgs[Math.round(r.n)];if(im)cx.drawImage(im,0,0)}
+if(FR.total){let ok=0;const all=FR.total-FR.start+1;
+ for(let n=FR.start;n<=FR.total;n++){const im=new Image();im.onload=()=>{if(++ok===all){cv.width=im.naturalWidth;cv.height=im.naturalHeight;
+  $('wrap').style.aspectRatio=im.naturalWidth+'/'+im.naturalHeight;cv.style.display='block';document.querySelector('.wrap svg').style.display='none';
+  fOn=true;fplay(FR.work[0],FR.work[1],true)}};im.src=fsrc(n);imgs[n]=im}}
+const _sm=setMode;
+setMode=m=>{if(fOn){const w=()=>fplay(FR.work[0],FR.work[1],true);
+ if(m==='work'){if(prev==='left'||prev==='right'){const R=FR[prev];fplay(R[1],R[0],false,w)}else w()}
+ else{const R=FR[m==='greet'?'greet':m];fplay(R[0],R[1],false)}}
+ prev=m;_sm(m)};
 const mq=matchMedia('(max-width:760px),(pointer:coarse)');
-
-// YouTube now requires a valid HTTP(S) referrer for embedded playback.
-// A file:// page has a null origin, so show a clear setup message instead of YouTube Error 153.
-if(location.protocol === 'file:'){
-  const notice=document.createElement('div');
-  notice.innerHTML='<strong>Local preview:</strong> YouTube inline playback needs this portfolio to run from an HTTP/HTTPS address. Upload it to your hosting, or run <code>python -m http.server 8000</code> in this folder and open <code>http://localhost:8000</code>.';
-  Object.assign(notice.style,{position:'fixed',left:'50%',bottom:'18px',transform:'translateX(-50%)',zIndex:'9999',maxWidth:'min(720px,calc(100vw - 32px))',padding:'12px 16px',borderRadius:'12px',background:'#0f2d44',color:'#fff',font:'13px/1.45 system-ui,sans-serif',boxShadow:'0 12px 30px rgba(15,45,68,.25)'});
-  document.body.appendChild(notice);
-}
-
 $('hero').addEventListener('pointermove',e=>{track.x=(e.clientX/innerWidth-.5)*2;track.y=(e.clientY/innerHeight-.5)*2;
  if(mq.matches||e.pointerType!=='mouse')return;
  const f=e.clientX/innerWidth,z=f<.33?'left':f>.67?'right':'center';
